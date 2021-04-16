@@ -1,0 +1,42 @@
+from math import exp
+
+print("Méthode de Dichotomie :")
+def Dichotomie(f,a ,b,epsilon):
+    n=1
+    while abs(b-a) > epsilon :
+        n+=1
+        m=(a+b)/2
+        if (f(a)*f(m))<= 0 :
+            b=m
+        else:
+            a=m
+    return n , m
+
+def f_1(x):
+    return x**4+3*x-9 
+print('fonction 1 :' , Dichotomie(f_1, -2,-1, 1e-10))
+print('fonction 1 :' , Dichotomie(f_1, 0, 2, 1e-10))
+
+def f_3(x):
+    return x*exp(x)-7
+print('fonction 3 :' , Dichotomie(f_3, 1, 2 ,1e-10))
+
+def f_6(x):
+    return exp(x)-x**2-3
+print('fonction 6 :' , Dichotomie(f_6, 1, 2,1e-10))
+
+print("Méthode de la sécante :")
+def Secante(f,x0,x1, epsilon,Nitermax):
+    n=1
+    xold=x0
+    xnew=x1-(x1-xold)*f(x1)/(f(x1)-f(xold))
+    while abs(xold-xnew)>epsilon and n<Nitermax :
+        xold=xnew
+        xnew=x1-(x1-xold)*f(x1)/(f(x1)-f(xold))
+        n+=1
+    return n, xnew
+
+print('fonction 1 :' , Secante(f_1, -1,-2, 1e-10,5e4))
+print('fonction 1 :' , Secante(f_1, 0,2, 1e-10,5e4))
+print('fonction 3 :' , Secante(f_3, 1,2, 1e-10,5e4))
+print('fonction 6 :' , Secante(f_6, 1,2, 1e-10,5e4))
