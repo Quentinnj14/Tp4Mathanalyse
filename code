@@ -1,42 +1,197 @@
-from math import exp
+from math import sin,cos
+from matplotlib.pyplot import semilogy
 
-print("Méthode de Dichotomie :")
-def Dichotomie(f,a ,b,epsilon):
-    n=1
-    while abs(b-a) > epsilon :
-        n+=1
-        m=(a+b)/2
-        if (f(a)*f(m))<= 0 :
-            b=m
-        else:
-            a=m
-    return n , m
+from matplotlib import pyplot as plt 
 
+liste_des_n1 = [1]
+liste_des_xn1 = []
+liste_des_en1 =[]
+
+liste_des_n2 = [1]
+liste_des_xn2 = []
+liste_des_en2 =[]
+
+liste_des_n3 = [1]
+liste_des_an = []
+liste_des_en3 =[]
+
+liste_des_n4 = [1]
+liste_des_xn4 = []
+liste_des_en4 =[]
+
+#----------------------------fonction----------------------------
+def g(x) :
+    return (1+sin(x))/2
+def f(x):
+    return 2*x-(1 + sin(x))
+def fder(x):
+    return 2-cos(x)
+
+def g_1(x) :
+    return (1+sin(x))/2
 def f_1(x):
-    return x**4+3*x-9 
-print('fonction 1 :' , Dichotomie(f_1, -2,-1, 1e-10))
-print('fonction 1 :' , Dichotomie(f_1, 0, 2, 1e-10))
+    return x**4 + 3*x-9
+def fder_1(x):
+    return 2-cos(x)
 
-def f_3(x):
-    return x*exp(x)-7
-print('fonction 3 :' , Dichotomie(f_3, 1, 2 ,1e-10))
-
-def f_6(x):
-    return exp(x)-x**2-3
-print('fonction 6 :' , Dichotomie(f_6, 1, 2,1e-10))
-
-print("Méthode de la sécante :")
-def Secante(f,x0,x1, epsilon,Nitermax):
-    n=1
+#---------------------------point fixe---------------------------
+def PointFixe_En( g,x0,epsilon,Nitermax ):
     xold=x0
-    xnew=x1-(x1-xold)*f(x1)/(f(x1)-f(xold))
-    while abs(xold-xnew)>epsilon and n<Nitermax :
+    xnew=g(xold)
+    n=1
+    while abs(xnew-xold)>epsilon and n<Nitermax :
         xold=xnew
-        xnew=x1-(x1-xold)*f(x1)/(f(x1)-f(xold))
-        n+=1
-    return n, xnew
+        xnew=g(xold)
+        n += 1
+    return xnew
 
-print('fonction 1 :' , Secante(f_1, -1,-2, 1e-10,5e4))
-print('fonction 1 :' , Secante(f_1, 0,2, 1e-10,5e4))
-print('fonction 3 :' , Secante(f_3, 1,2, 1e-10,5e4))
-print('fonction 6 :' , Secante(f_6, 1,2, 1e-10,5e4))
+
+alpha = PointFixe_En(g,0,1e-14,5e4)
+
+
+def PointFixe( g,x0,epsilon,Nitermax ):
+    xold=x0
+    xnew=g(xold)
+    n=1
+    liste_des_xn1.append(xold)
+    liste_des_en1.append(abs(xold-alpha))
+    while abs(xnew-xold)>epsilon and n<Nitermax :
+        xold=xnew
+        liste_des_xn1.append(xold)
+        liste_des_en1.append(abs(xold-alpha))
+        xnew=g(xold)
+        n += 1
+        liste_des_n1.append(n)
+    return liste_des_n1 ,liste_des_xn1 ,liste_des_en1
+
+print('-----------------------------------------------------------------------------------')
+print("fonction3 Point fixe:",PointFixe(g,0,1e-10, 5e4))
+
+
+#----------------------------Newton----------------------------
+def Newton_En( f,fder,x0,epsilon,Nitermax ) : 
+    xold = x0
+    xnew = xold-(f(xold))/(fder(xold))
+    n = 1
+    while abs(xnew-xold)> epsilon and n < Nitermax :
+        xold = xnew
+        xnew = xold-(f(xold))/(fder(xold))
+        n += 1  
+    return xnew
+
+
+alpha2 = Newton_En(f,fder, 0, 1e-14, 5e4) 
+
+def Newton( f,fder,x0,epsilon,Nitermax ) : 
+    xold = x0
+    xnew = xold-(f(xold))/(fder(xold))
+    n = 1
+    liste_des_xn2.append(x0)
+    liste_des_en2.append(abs(xold-alpha2))
+    while abs(xnew-xold)> epsilon and n < Nitermax :
+        xold = xnew
+        liste_des_xn2.append(xold)
+        liste_des_en2.append(abs(xold-alpha2))
+        xnew = xold-(f(xold))/(fder(xold))
+        n += 1
+        liste_des_n2.append(n)
+    return liste_des_n2 ,liste_des_xn2 ,liste_des_en2 
+
+print('-----------------------------------------------------------------------------------')
+print("fonction3 Newton: ",Newton(f,fder,0,1e-10, 5e4))
+
+
+#----------------------------Dichtomie----------------------------
+def Dichotomie_En(f,a0,b0,epsilon,Nitermax):
+    an=a0
+    bn=b0
+    n=1
+    while abs(bn-an) > epsilon and n < Nitermax :
+        m = (an + bn)/2
+        n+=1
+        if (f(an)*f(m)) <= 0 :
+            bn = m
+        else:
+            an = m
+    return  m 
+
+alpha3 = Dichotomie_En(f, 0 , 1 , 1e-14 , 5e4)
+
+def Dichotomie (f,a0,b0,epsilon,Nitermax):
+    an=a0
+    bn=b0
+    n=1
+    liste_des_an.append(a0)
+    liste_des_en3.append(abs(a0-alpha3))
+    while abs(bn-an) > epsilon and n < Nitermax :
+        m = (an + bn)/2
+        liste_des_an.append(m)
+        liste_des_en3.append(abs(m-alpha3))
+        n+=1
+        if (f(an)*f(m)) <= 0 :
+            bn = m
+        else:
+            an = m
+        liste_des_n3.append(n)
+    return  liste_des_n3 ,liste_des_an ,liste_des_en3
+
+print('-----------------------------------------------------------------------------------')
+print('fonction 3 méthode dichotomie :' ,Dichotomie(f, 0 , 1 , 1e-10 , 5e4)) 
+
+
+#----------------------------Sécante----------------------------
+
+
+def secante(f, x, y, epsilon,Nitermax):
+
+    xold, xnew = x, x - (x - y) * f(x) / (f(x) - f(y))
+    n = 1
+
+    liste_des_xn4.append(xold)
+
+
+    while (abs(xnew - xold) >= epsilon) and (n < Nitermax):
+        xold, xnew = xnew, xold - (xold - xnew) * f(xold) / (f(xold) - f(xnew))
+        n += 1
+        liste_des_n4.append(n)
+        liste_des_xn4.append(xold)
+    alpha = xold
+    
+    xold, xnew = x, x - (x - y) * f(x) / (f(x) - f(y))
+    n = 1
+
+    En = abs(xold-alpha)
+    liste_des_en4.append(En)
+
+    while (abs(xnew - xold) >= epsilon) and (n < Nitermax):
+        xold, xnew = xnew, xold - (xold - xnew) * f(xold) / (f(xold) - f(xnew))
+        n += 1
+        En = abs(xold-alpha)
+        liste_des_en4.append(En)
+
+    return liste_des_n4, liste_des_xn4, liste_des_en4
+print('-----------------------------------------------------------------------------------')
+print('fonction 3 méthode secante :' ,secante(f, 0 , 1 , 1e-14 , 5e4))
+
+
+
+x = liste_des_n1 ;
+y = liste_des_en1;
+plt.semilogy(x,y,label ='PointFixe')
+
+
+x2= liste_des_n2 ;
+y2= liste_des_en2;
+semilogy(x2,y2,label ='Newton')
+
+x3= liste_des_n3 ;
+y3= liste_des_en3;
+semilogy(x3,y3,label ='Dichotomie')
+
+x4= liste_des_n4 ;
+y4= liste_des_en4;
+semilogy(x4,y4,label ='Sécante')
+plt.legend()
+plt.xlabel('Iteration (n)')
+plt.ylabel('Erreur (En)')
+
